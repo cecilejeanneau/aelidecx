@@ -1,0 +1,37 @@
+# Database
+data/notes.db
+data/notes.db-wal
+data/notes.db-shm
+data/notes-backup-*.db
+
+# Uploads (images uploadées)
+uploads/
+
+# Go build
+backend/server
+backend/server.exe
+
+# Go modules
+backend/vendor/
+go.sum
+
+# Environment
+.env
+.env.local
+
+# System
+.DS_Store
+Thumbs.db
+.vscode/
+*.swp
+*.swo
+*~
+
+# IDE
+.idea/
+*.iml
+
+# Node (si on ajoute du tooling plus tard)
+node_modules/
+package-lock.json
+yarn.lock

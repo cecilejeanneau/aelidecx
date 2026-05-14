@@ -1,0 +1,53 @@
+@startuml data-model
+!theme plain
+title Aelidecx - Data model
+
+skinparam backgroundColor #1a1a2e
+skinparam defaultFontColor #eaeaea
+skinparam ClassBackgroundColor #16213e
+skinparam ClassBorderColor #4ecdc4
+skinparam ClassHeaderBackgroundColor #0f3460
+
+class notes {
+    + id : INTEGER <<PK, AUTOINCREMENT>>
+    --
+    title : TEXT [NOT NULL, DEFAULT '']
+    content : TEXT [NOT NULL, DEFAULT '']
+    folder : TEXT [NOT NULL, DEFAULT 'inbox']
+    created_at : DATETIME [DEFAULT CURRENT_TIMESTAMP]
+    updated_at : DATETIME [DEFAULT CURRENT_TIMESTAMP]
+}
+
+class notes_fts <<FTS5 Virtual Table>> {
+    + rowid : INTEGER <<FK -> notes.id>>
+    --
+    title : TEXT
+    content : TEXT
+}
+
+class "uploads (filesystem)" as uploads {
+    filename : "{timestamp_nano}.{ext}"
+    --
+    Allowed formats:
+    .png, .jpg, .jpeg
+    .gif, .webp, .svg
+}
+
+notes ||--|| notes_fts : "triggers\n(INSERT/UPDATE/DELETE)"
+notes "1" --> "0..*" uploads : "referenced via\n<img src='/uploads/...'>\nin content (HTML)"
+
+note bottom of notes
+  Allowed folders:
+  inbox | concepts | practices
+  ui-ux | postmortems | references
+end note
+
+note right of notes_fts
+  Synced by SQLite triggers:
+  - notes_ai (AFTER INSERT)
+  - notes_ad (AFTER DELETE)
+  - notes_au (AFTER UPDATE)
+  Enables full-text search
+  with automatic ranking.
+end note
+@enduml

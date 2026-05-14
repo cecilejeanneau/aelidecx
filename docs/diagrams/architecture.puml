@@ -1,0 +1,48 @@
+@startuml architecture
+!theme plain
+title Aelidecx - System architecture
+
+skinparam componentStyle rectangle
+skinparam backgroundColor #1a1a2e
+skinparam defaultFontColor #eaeaea
+skinparam ArrowColor #4ecdc4
+skinparam ComponentBackgroundColor #16213e
+skinparam ComponentBorderColor #2a2a4a
+skinparam NodeBackgroundColor #0f3460
+skinparam NodeBorderColor #e94560
+skinparam NoteBackgroundColor #16213e
+skinparam NoteBorderColor #4ecdc4
+
+node "Android (Termux)" as android {
+    component "Go Server\n(Fiber)" as server
+    database "SQLite\n(WAL + FTS5)" as db
+    folder "/uploads" as uploads
+    folder "/frontend" as static
+}
+
+node "PC (Browser)" as pc {
+    component "Browser\n(Chrome/Edge/Firefox)" as browser_pc
+}
+
+node "Phone (Browser)" as phone {
+    component "Browser\n(Chrome)" as browser_phone
+}
+
+server --> db : note CRUD
+server --> uploads : image storage
+server --> static : serves static files
+
+browser_pc --> server : HTTP (WiFi/Hotspot)\nhttp://192.168.x.x:3000
+browser_phone --> server : HTTP (localhost)\nhttp://localhost:3000
+
+note right of android
+  Termux provides a full Linux
+  environment on Android.
+  The Go server uses about 10 MB RAM.
+end note
+
+note bottom of db
+  WAL mode enables non-blocking reads.
+  FTS5 enables fast full-text search.
+end note
+@enduml

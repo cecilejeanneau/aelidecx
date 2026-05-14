@@ -1,0 +1,75 @@
+@startuml sequence-crud
+!theme plain
+title Sequence - Note CRUD (create / edit / delete)
+
+skinparam backgroundColor #1a1a2e
+skinparam defaultFontColor #eaeaea
+skinparam ParticipantBackgroundColor #0f3460
+skinparam ParticipantBorderColor #4ecdc4
+skinparam SequenceLifeLineBorderColor #2a2a4a
+skinparam ArrowColor #4ecdc4
+skinparam NoteBackgroundColor #16213e
+skinparam NoteBorderColor #e94560
+
+actor "User\n(Browser)" as user
+participant "Frontend\n(app.js)" as front
+participant "API\n(api.js)" as api
+participant "Go Server\n(Fiber)" as server
+database "SQLite" as db
+
+== Create note ==
+
+user -> front : Click "+ New note"
+front -> front : reset title, editor, folder
+user -> front : Enter title + content + paste image
+user -> front : Click "Save"
+front -> api : createNote({title, content, folder})
+api -> server : POST /api/notes\n{JSON body}
+server -> db : INSERT INTO notes
+db --> server : id (lastInsertId)
+server --> api : 201 {id: 42}
+api --> front : {id: 42}
+front -> front : currentNoteId = 42
+front -> api : fetchNotes(folder)
+api -> server : GET /api/notes?folder=...
+server -> db : SELECT ... ORDER BY updated_at DESC
+db --> server : rows
+server --> api : [notes...]
+api --> front : [notes...]
+front -> front : renderNotesList()
+
+== Edit note ==
+
+user -> front : Click note in list
+front -> api : fetchNote(42)
+api -> server : GET /api/notes/42
+server -> db : SELECT ... WHERE id = 42
+db --> server : note
+server --> api : {id, title, content, ...}
+api --> front : note data
+front -> front : setContent(note.content)
+user -> front : Edit content
+user -> front : Click "Save"
+front -> api : updateNote(42, {title, content, folder})
+api -> server : PUT /api/notes/42\n{JSON body}
+server -> db : UPDATE notes SET ... WHERE id = 42
+note right of db : Trigger notes_au updates\nFTS5 table
+db --> server : ok
+server --> api : {ok: true}
+api --> front : success
+front -> front : reload list
+
+== Delete note ==
+
+user -> front : Click "Delete"
+front -> user : confirm("Delete?")
+user -> front : OK
+front -> api : deleteNote(42)
+api -> server : DELETE /api/notes/42
+server -> db : DELETE FROM notes WHERE id = 42
+note right of db : Trigger notes_ad removes\nrow from FTS5
+db --> server : ok
+server --> api : {ok: true}
+api --> front : success
+front -> front : reset editor + reload list
+@enduml

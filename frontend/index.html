@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aelidecx</title>
+    <!-- Main stylesheet: dark theme, responsive layout -->
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+    <!-- Authentication modal: shown on first visit or after session expiry.
+         The API key is validated by a test request and stored in sessionStorage. -->
+    <div id="auth-modal" class="modal hidden">
+        <div class="modal-content">
+            <h2>🔐 Authentication</h2>
+            <p>Enter your API key to access your notes.</p>
+            <input type="password" id="auth-input" placeholder="API key..." autocomplete="off">
+            <button id="auth-btn">Sign in</button>
+            <p class="auth-error hidden" id="auth-error"></p>
+        </div>
+    </div>
+
+    <!-- Main application shell -->
+    <div id="app">
+
+        <!-- Sidebar: folder navigation, search, and note list -->
+        <aside id="sidebar">
+            <h1>✦ Aelidecx</h1>
+
+            <!-- Full-text search input (debounced, 300 ms) -->
+            <div id="search-box">
+                <input type="text" id="search-input" placeholder="Search...">
+            </div>
+
+            <!-- Folder filter buttons; data-folder="" means "all folders" -->
+            <nav id="folders">
+                <button class="folder-btn active" data-folder="">All</button>
+                <button class="folder-btn" data-folder="inbox">Inbox</button>
+                <button class="folder-btn" data-folder="concepts">Concepts</button>
+                <button class="folder-btn" data-folder="practices">Practices</button>
+                <button class="folder-btn" data-folder="ui-ux">UI / UX</button>
+                <button class="folder-btn" data-folder="postmortems">Postmortems</button>
+                <button class="folder-btn" data-folder="references">References</button>
+            </nav>
+
+            <button id="new-note-btn">+ New note</button>
+
+            <!-- Dynamically populated note list (rendered by app.js) -->
+            <ul id="notes-list"></ul>
+        </aside>
+
+        <!-- Editor area: title, folder picker, toolbar, and contenteditable body -->
+        <main id="editor-area">
+            <div id="editor-header">
+                <input type="text" id="note-title" placeholder="Note title...">
+                <!-- Folder selector; value must match a validated folder slug on the backend -->
+                <select title="folder selector" id="note-folder">
+                    <option value="inbox">Inbox</option>
+                    <option value="concepts">Concepts</option>
+                    <option value="practices">Practices</option>
+                    <option value="ui-ux">UI / UX</option>
+                    <option value="postmortems">Postmortems</option>
+                    <option value="references">References</option>
+                </select>
+                <button id="save-btn">Save</button>
+                <button id="delete-btn">Delete</button>
+            </div>
+
+            <!-- Formatting toolbar injected by editor.js -->
+            <div id="toolbar"></div>
+
+            <!-- Rich-text editor: contenteditable div managed by editor.js.
+                 Supports paste/drop image upload and execCommand formatting. -->
+            <div id="editor"></div>
+        </main>
+    </div>
+
+    <!-- Entry point: ES module, imports app.js which imports api.js and editor.js -->
+    <script type="module" src="/js/app.js"></script>
+</body>
+</html>

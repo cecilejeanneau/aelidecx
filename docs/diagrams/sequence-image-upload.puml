@@ -1,0 +1,55 @@
+@startuml sequence-image
+!theme plain
+title Sequence - Image upload (paste / drop / button)
+
+skinparam backgroundColor #1a1a2e
+skinparam defaultFontColor #eaeaea
+skinparam ParticipantBackgroundColor #0f3460
+skinparam ParticipantBorderColor #4ecdc4
+skinparam ArrowColor #4ecdc4
+skinparam NoteBackgroundColor #16213e
+skinparam NoteBorderColor #e94560
+
+actor "User" as user
+participant "TipTap Editor\n(editor.js)" as editor
+participant "API module\n(api.js)" as api
+participant "Go Server\n(Fiber)" as server
+collections "/uploads\n(filesystem)" as fs
+
+== Paste image (Ctrl+V) ==
+
+user -> editor : Ctrl+V (clipboard image)
+editor -> editor : handlePaste()\ndetect item.type = 'image/*'
+editor -> editor : getAsFile() -> File blob
+editor -> api : uploadImage(file)
+api -> server : POST /api/upload\nmultipart/form-data
+server -> server : Validate extension\n(.png .jpg .jpeg .gif .webp .svg)
+server -> fs : Save\n{timestamp_nano}.{ext}
+fs --> server : ok
+server --> api : {url: "/uploads/1714988...png"}
+api --> editor : {url}
+editor -> editor : editor.setImage({src: url})
+editor --> user : Image shown in editor
+
+== Drag and drop ==
+
+user -> editor : Drop image file
+editor -> editor : handleDrop()\ndetect dataTransfer.files
+editor -> api : uploadImage(file)
+note right of api : Same flow as above
+api -> server : POST /api/upload
+server -> fs : Save file
+server --> api : {url}
+api --> editor : display image
+
+== Camera button ==
+
+user -> editor : Click camera button
+editor -> editor : <input type="file">\naccept="image/*"
+user -> editor : Select file
+editor -> api : uploadImage(file)
+api -> server : POST /api/upload
+server -> fs : Save file
+server --> api : {url}
+api --> editor : display image
+@enduml

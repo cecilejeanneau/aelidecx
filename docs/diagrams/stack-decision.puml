@@ -1,0 +1,123 @@
+@startuml stack-decision
+!theme plain
+title Stack decision - Decision tree
+
+skinparam backgroundColor #1a1a2e
+skinparam defaultFontColor #eaeaea
+skinparam ActivityBackgroundColor #0f3460
+skinparam ActivityBorderColor #4ecdc4
+skinparam ActivityDiamondBackgroundColor #16213e
+skinparam ActivityDiamondBorderColor #e94560
+skinparam ArrowColor #4ecdc4
+skinparam NoteBackgroundColor #16213e
+skinparam NoteBorderColor #4ecdc4
+
+start
+
+:Project constraints;
+note right
+  - Free (0 EUR)
+  - Nothing to install on work PC
+  - Accessible anywhere (browser)
+  - Rich editor (copy/paste images)
+  - Career-proof (personal data)
+  - Minimal phone battery impact
+end note
+
+if (Hosting?) then (paid cloud)
+  :Cloud hosting rejected;
+  stop
+else (free)
+  if (24/7 server availability?) then (personal PC)
+    :PC must stay on\n(not practical);
+    stop
+  else (phone)
+    :Phone is always on;
+  endif
+endif
+
+:Android runtime choice;
+note right
+  Termux is the only mature
+  free runtime on Android
+  (full Linux without root).
+end note
+
+if (Backend language?) then
+  :Phone-focused evaluation;
+  note right
+    | Language | RAM | Speed | Termux | Familiar? |
+    | Go | ~10 MB | high | yes | yes |
+    | Node.js | ~50 MB | good | yes | yes |
+    | Python | ~80 MB | medium | yes | medium |
+    | Bun | ~30 MB | high | partial | low |
+  end note
+  :Go selected;
+  note right
+    - Very light runtime footprint
+    - Single static binary output
+    - Lower battery impact
+    - Familiar for maintainers
+  end note
+endif
+
+if (Go framework?) then
+  :net/http vs Fiber;
+  note right
+    Fiber provides Express-like APIs,
+    built-in routing and middleware,
+    and fast onboarding.
+  end note
+  :Fiber selected;
+endif
+
+if (Database?) then
+  :SQLite vs PostgreSQL vs files;
+  note right
+    - Embedded, zero config database
+    - Native FTS5 full-text search
+    - WAL for non-blocking reads
+    - Single file backup model
+    - Great for single-user workloads
+  end note
+  :SQLite (WAL + FTS5) selected;
+endif
+
+if (Frontend framework?) then
+  :React vs Vue vs Svelte vs Vanilla;
+  note right
+    | Framework | Weight | Separation | Build |
+    | React | 45 KB | JSX | yes |
+    | Vue 3 | 30 KB | SFC | yes |
+    | Svelte | 5 KB | SFC | yes |
+    | Vanilla | 0 KB | full | no |
+  end note
+  :Vanilla JS modules selected;
+  note right
+    - No build pipeline required
+    - Clear module separation
+    - Minimal runtime footprint
+    - TipTap works standalone
+  end note
+endif
+
+if (Rich editor?) then
+  :TipTap vs Quill vs ProseMirror;
+  note right
+    - TipTap is ProseMirror-based
+    - Native image paste support
+    - Extensible command model
+    - Free open source
+    - Works with CDN ESM setup
+  end note
+  :TipTap selected;
+endif
+
+:Final stack validated;
+note right
+  Go + Fiber + SQLite + Vanilla JS + TipTap
+  on Termux (Android)
+end note
+
+stop
+@enduml

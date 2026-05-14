@@ -1,0 +1,29 @@
+@startuml sequence-search
+!theme plain
+title Sequence - Full-text search
+
+skinparam backgroundColor #1a1a2e
+skinparam defaultFontColor #eaeaea
+skinparam ParticipantBackgroundColor #0f3460
+skinparam ParticipantBorderColor #4ecdc4
+skinparam ArrowColor #4ecdc4
+skinparam NoteBackgroundColor #16213e
+skinparam NoteBorderColor #e94560
+
+actor "User" as user
+participant "Frontend\n(app.js)" as front
+participant "API\n(api.js)" as api
+participant "Go Server\n(Fiber)" as server
+database "SQLite\n(notes_fts)" as fts
+
+user -> front : Type "pattern UI" in search box
+front -> front : debounce 300ms
+front -> api : searchNotes("pattern UI")
+api -> server : GET /api/search?q=pattern+UI
+server -> fts : SELECT ... FROM notes\nJOIN notes_fts\nWHERE notes_fts MATCH 'pattern UI'\nORDER BY rank LIMIT 50
+fts --> server : results ranked by relevance
+server --> api : [{id, title, content, folder, ...}, ...]
+api --> front : notes[]
+front -> front : renderNotesList(notes)
+front --> user : Show filtered results
+@enduml
