@@ -129,6 +129,18 @@ go build -o server .
 ./server
 ```
 
+On Windows PowerShell, you can use the shorter launcher from the repo root:
+
+```powershell
+.\start-dev.ps1
+```
+
+If port `3000` is already taken, use a different one:
+
+```powershell
+.\start-dev.ps1 -Port 3001
+```
+
 You should see:
 ```
 Server running on http://0.0.0.0:3000

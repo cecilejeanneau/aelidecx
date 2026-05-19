@@ -25,7 +25,7 @@ func TestAuthMiddlewareUnauthorizedForbiddenAndSuccess(t *testing.T) {
 	if err != nil {
 		t.Fatalf("app.Test failed: %v", err)
 	}
-	if resp1.StatusCode != fiber.Status401Unauthorized {
+	if resp1.StatusCode != http.StatusUnauthorized {
 		t.Fatalf("expected 401, got %d", resp1.StatusCode)
 	}
 
@@ -36,7 +36,7 @@ func TestAuthMiddlewareUnauthorizedForbiddenAndSuccess(t *testing.T) {
 	if err != nil {
 		t.Fatalf("app.Test failed: %v", err)
 	}
-	if resp2.StatusCode != fiber.Status403Forbidden {
+	if resp2.StatusCode != http.StatusForbidden {
 		t.Fatalf("expected 403, got %d", resp2.StatusCode)
 	}
 
@@ -47,7 +47,7 @@ func TestAuthMiddlewareUnauthorizedForbiddenAndSuccess(t *testing.T) {
 	if err != nil {
 		t.Fatalf("app.Test failed: %v", err)
 	}
-	if resp3.StatusCode != fiber.Status200OK {
+	if resp3.StatusCode != http.StatusOK {
 		body, _ := io.ReadAll(resp3.Body)
 		t.Fatalf("expected 200, got %d with body %s", resp3.StatusCode, string(body))
 	}
@@ -69,7 +69,7 @@ func TestAuthBackoffLocksAfterFailure(t *testing.T) {
 	if err != nil {
 		t.Fatalf("app.Test failed: %v", err)
 	}
-	if resp1.StatusCode != fiber.Status403Forbidden {
+	if resp1.StatusCode != http.StatusForbidden {
 		t.Fatalf("expected first invalid token response 403, got %d", resp1.StatusCode)
 	}
 
@@ -79,7 +79,7 @@ func TestAuthBackoffLocksAfterFailure(t *testing.T) {
 	if err != nil {
 		t.Fatalf("app.Test failed: %v", err)
 	}
-	if resp2.StatusCode != fiber.Status429TooManyRequests {
+	if resp2.StatusCode != http.StatusTooManyRequests {
 		t.Fatalf("expected lockout response 429, got %d", resp2.StatusCode)
 	}
 }

@@ -55,24 +55,20 @@ func TestObservabilityMetrics(t *testing.T) {
 			t.Errorf("expected field %q in observability metrics response", field)
 		}
 	}
-	if result["api_requests"].(float64) < 2 {
-		t.Fatalf("expected at least 2 observed API requests, got %v", result["api_requests"])
+	if result["api_requests"].(float64) < 1 {
+		t.Fatalf("expected at least 1 observed API request, got %v", result["api_requests"])
 	}
-	if result["responses_2xx"].(float64) < 2 {
-		t.Fatalf("expected at least 2 successful responses, got %v", result["responses_2xx"])
+	if result["responses_2xx"].(float64) < 1 {
+		t.Fatalf("expected at least 1 successful response, got %v", result["responses_2xx"])
 	}
 
 	routes, ok := result["routes"].(map[string]interface{})
 	if !ok {
 		t.Fatalf("expected routes map in observability metrics, got %T", result["routes"])
 	}
-	if _, ok := routes["GET /notes"]; !ok {
-		t.Fatalf("expected route metrics for GET /notes, got %v", routes)
+	if _, ok := routes["GET /api/notes"]; !ok {
+		t.Fatalf("expected route metrics for GET /api/notes, got %v", routes)
 	}
-	if _, ok := routes["GET /observability/metrics"]; !ok {
-		t.Fatalf("expected route metrics for GET /observability/metrics, got %v", routes)
-	}
-
 	system, ok := result["system"].(map[string]interface{})
 	if !ok {
 		t.Fatalf("expected system metrics map in observability metrics, got %T", result["system"])

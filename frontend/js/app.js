@@ -187,8 +187,26 @@ function handleSearch() {
  */
 function formatDate(dateStr) {
     if (!dateStr) return '';
-    const d = new Date(dateStr + 'Z');
-    return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+    const d = parseApiDate(dateStr);
+    if (Number.isNaN(d.getTime())) return '';
+    return d.toLocaleString('en-GB', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+    });
+}
+
+/**
+ * Parses a backend timestamp that may be returned as SQLite UTC text or ISO 8601.
+ * @param {string} dateStr - Timestamp string from the API.
+ * @returns {Date}
+ */
+function parseApiDate(dateStr) {
+    const normalized = dateStr.trim().replace(' ', 'T');
+    const hasTimezone = /([zZ]|[+-]\d{2}:?\d{2})$/.test(normalized);
+    return new Date(hasTimezone ? normalized : `${normalized}Z`);
 }
 
 // ========== AUTHENTICATION ==========
